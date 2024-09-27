@@ -7,6 +7,7 @@ import { useAppSelector } from "@/utils/hooks";
 import EditButton from "./EditBetButton";
 
 const Playerbets = ({ headers, data }: any) => {
+  
   const activeid: any = useAppSelector((state) => state.globlestate.betId);
   const { systemTheme, theme } = useTheme();
   const currentTheme = theme === "system" ? systemTheme : theme;
