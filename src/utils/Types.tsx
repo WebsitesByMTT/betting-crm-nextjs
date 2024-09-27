@@ -63,7 +63,7 @@ export interface TableProps {
   fieldsHeadings: string[];
   fieldData: string[];
   Page?: string;
-  data: string[];
+  data: any;
   width?:string;
 }
 

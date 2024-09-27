@@ -27,9 +27,9 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async (category: string) => {
       const categoriesData = await fetchSportsCategory();
-      if (categoriesData?.error) {
-         toast.error(categoriesData?.error);
-         router.push('/login');
+      if (categoriesData?.statuscode===401) {
+        toast.error(categoriesData.error)
+         router.push('/logout');
       }
       setCategories(categoriesData);
     };

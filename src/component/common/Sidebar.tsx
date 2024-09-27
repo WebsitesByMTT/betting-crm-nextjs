@@ -12,7 +12,6 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
-
 const Sidebar = ({ params }: any) => {
   const isOpen = useSelector(
     (state: { globlestate: { openHeader: Boolean } }) =>
@@ -20,7 +19,7 @@ const Sidebar = ({ params }: any) => {
   );
   const dispatch = useDispatch();
   const router = usePathname();
-  const navigate=useRouter()
+  const navigate = useRouter();
   const [user, setUser] = useState<any | null>(null);
   const [nav, setNav] = useState([
     {
@@ -41,12 +40,12 @@ const Sidebar = ({ params }: any) => {
     },
   ]);
   const fetchUser = async () => {
-    
-    const currentUser:any = await getCurrentUser();
-    setUser(currentUser);
+    const currentUser: any = await getCurrentUser();
     if (currentUser?.role === "player") {
       navigate.push("/logout");
     }
+    setUser(currentUser);
+   
     switch (currentUser?.role) {
       case "distributor":
         setNav((prevNav) =>
@@ -82,7 +81,7 @@ const Sidebar = ({ params }: any) => {
 
   useEffect(() => {
     fetchUser();
-  },[]);
+  }, []);
 
   return (
     <>
@@ -120,7 +119,7 @@ const Sidebar = ({ params }: any) => {
           <div>
             <ul className="pt-12 space-y-1">
               {nav?.map((nav, ind) => (
-                <>
+                <div key={ind}>
                   <li
                     key={ind}
                     onClick={() => dispatch(UpdateHeader(false))}
@@ -138,7 +137,7 @@ const Sidebar = ({ params }: any) => {
                     </Link>
                   </li>
                   <span className="w-[80%] opacity-35 -translate-y-2 inline-block mt-1 h-[1px] mx-[15%] rounded-full bg-gradient-to-r dark:from-[#2e2e2e00] dark:to-[#2e2e2e00] dark:via-[#313131] via-[#979797] from-[#313131] to-[#313131] "></span>
-                </>
+                </div>
               ))}
               {user?.role === "admin" && (
                 <>

@@ -7,6 +7,7 @@ import RecentTransaction from "@/component/ui/RecentTransaction";
 import { config } from "@/utils/config";
 import { getCookie, getCurrentUser } from "@/utils/utils";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 async function getSummary(days:string) {
   const user: any = await getCurrentUser()
@@ -25,7 +26,7 @@ async function getSummary(days:string) {
     if (!response.ok) {
       const error = await response.json();
       
-      return { error: error.message };
+      return { error: error.message,statuscode: response.status};
     }
 
     const data = await response.json();
@@ -44,6 +45,10 @@ export default async function Home({searchParams}:any) {
 
   const user: any = await getCurrentUser()
   const userRole: string = user?.role;
+
+  if (summary?.statuscode===401) {
+    redirect('/logout')
+  }
   const TopCards = {
     admin: [
       {
@@ -166,7 +171,7 @@ export default async function Home({searchParams}:any) {
   return (
     <div className="flex-1">
       <Header />
-      <div className="p-4">
+      <div className="p-2">
           <DaysWiseReport />
         <div className="grid pt-3 grid-cols-12 gap-2 xl:w-[92%] md:gap-y-5   md:gap-5 ">
           <Card TopCards={TopCards[userRole as keyof typeof TopCards]} />

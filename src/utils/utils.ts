@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
+import { redirect } from "next/navigation";
 
 export const getCookie = async () => {
   const cookieStore = cookies();
@@ -42,7 +43,7 @@ export const formatDate = (dateString: string) => {
 export const rolesHierarchy = (role:string): string[] => {
   switch (role) {
     case 'admin':
-      return ["all","distributor", "subdistributor", "agent", "player"];
+    return ["all","distributor", "subdistributor", "agent", "player"];
     case 'distributor':
       return ["subdistributor"];
     case 'subdistributor':
@@ -50,7 +51,7 @@ export const rolesHierarchy = (role:string): string[] => {
     case 'agent':
       return ["player"];
     default:
-      throw new Error(`Unknown role: ${role}`);
+      return redirect('/logout');
   }
 };
 

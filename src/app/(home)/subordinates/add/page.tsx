@@ -83,15 +83,17 @@ const Page: React.FC = () => {
 
     try {
       setLoad(true)
-      let response;
+      let response:any;
       if (formData?.role === 'player') {
         response = await createPlayer(dataObject);
       } else {
         response = await createSubordinates(dataObject);
       }
-      if (response?.error) {
+      if (response) {
         toast.error(response?.error || `Can't create ${formData.role}`);
-        router.push('/logout')
+        if (response?.statuscode===401) {
+          router.push('/logout')
+        }
       } else {
         toast.success(`${formData.role} Created Successfully!`);
         setFormData({ username: "", password: "", role: "" });
@@ -171,7 +173,7 @@ const Page: React.FC = () => {
                   ))}
                 </select>
                 <span className="pr-4 text-white text-opacity-40 font-bold dark:text-black">
-                   <Down />
+                  <Down />
                 </span>
               </div>
               {errors.role && (

@@ -6,16 +6,16 @@ import Notification from "../svg/Notification";
 import Logout from "../svg/Logout";
 import DarkMode from "../svg/DarkMode";
 import { useTheme } from "next-themes";
-import { useDispatch} from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   UpdateCredit,
   UpdateHeader,
   UpdateNotification,
 } from "@/redux/ReduxSlice";
 import HamBurger from "../svg/HamBurger";
-import {useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Infinite from "../svg/Infinite";
-import { getCredits} from "@/utils/action";
+import { getCredits } from "@/utils/action";
 import toast from "react-hot-toast";
 import { useAppSelector } from "@/utils/hooks";
 import Cookies from "js-cookie";
@@ -29,14 +29,15 @@ const Header = ({ Back }: any) => {
   const allNotifications = useAppSelector((state: any) => state?.globlestate?.AllNotification)?.filter((item: any) => item?.viewed === false)?.length
   useEffect(() => {
     setCount(allNotifications)
-  },[allNotifications])
+  }, [allNotifications])
   useEffect(() => {
     setMounted(true);
   }, []);
   const currentTheme = theme === "system" ? systemTheme : theme;
   const fetchUser = async () => {
     const currentUser = await getCredits();
-    if (currentUser.error) {
+
+    if (currentUser.statuscode === 401) {
       router.push("/logout");
     } else {
       setUser(currentUser);
@@ -106,8 +107,8 @@ const Header = ({ Back }: any) => {
           onClick={() => dispatch(UpdateNotification(true))}
         >
           <Notification />
-          { count>= 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+          {count >= 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full min-w-4 min-h-4 flex items-center justify-center">
               {count}
             </span>
           )}

@@ -24,8 +24,8 @@ export default async function RootLayout({
       <div className="flex-1">
         <Header />
         <div className="px-2 md:px-10 pt-5">
-          <div className="flex pb-4 items-center justify-between">
-            <div className="w-[70%] xl:w-[50%]">
+          <div className="md:flex pb-4 items-center space-y-2 md:space-y-0 md:space-x-2 justify-between">
+            <div className="w-full md:w-[70%] xl:w-[50%]">
               <SearchBar />
             </div>
             <div className="flex gap-4">

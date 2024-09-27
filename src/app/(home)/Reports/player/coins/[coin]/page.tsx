@@ -75,11 +75,11 @@ const page = async ({ params, searchParams }: any) => {
           <SubordinatesReport reportData={reportData} />
           <div className="md:flex items-center justify-between">
             <ReportTabs params={params?.report} tabs={tabs} />
-            <div className="flex w-[40%] pb-2 gap-3">
+            <div className="space-y-2 md:space-y-0 md:flex w-full md:w-[40%] pb-2 gap-3">
               <div>
                 <DateFilter />
               </div>
-              <div className="md:w-[80%] w-[80%]">
+              <div className="md:w-[80%] w-[100%]">
                 <SearchBar />
               </div>
             </div>

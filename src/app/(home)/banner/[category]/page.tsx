@@ -44,8 +44,9 @@ const Page = (params: any) => {
     setLoad(true);
     const response = await updateBannerStatus(selectedBanner, newStatus);
     setLoad(false);
-    if (response.error) {
-      return toast.error(response?.error);
+    if (response.statuscode===401) {
+      toast.error(response.error)
+       router.push('/logout');
     }
     toast.success(response.message);
     fetchData(category, status);
@@ -56,8 +57,9 @@ const Page = (params: any) => {
     setLoad(true);
     const response = await deleteBanners(selectedBanner);
     setLoad(false);
-    if (response.error) {
-      return router.push('/logout');
+    if (response.statuscode===401) {
+      toast.error(response.error)
+       router.push('/logout');
     }
     toast.success(response.message);
     fetchData(category, status);
@@ -66,8 +68,8 @@ const Page = (params: any) => {
 
   return (
     <div>
-      <div className="w-full flex justify-between">
-        <div className="flex gap-2 py-4 items-center">
+      <div className="w-full md:flex pb-3 md:pb-0  justify-between">
+        <div className="flex gap-2 w-full py-4 items-center">
           <button onClick={() => router.back()}>
             <Back />
           </button>
@@ -75,7 +77,7 @@ const Page = (params: any) => {
             {category}
           </h3>
         </div>
-        <div className="flex gap-3 items-center justify-center">
+        <div className="flex w-full gap-3 items-center justify-center">
           <div className="bg-[#1A1A1A] flex items-center  dark:bg-onDark dark:border-opacity-30 border-opacity-60 border-dark_black rounded-lg border-[1px] relative">
             <select
               name="category"
