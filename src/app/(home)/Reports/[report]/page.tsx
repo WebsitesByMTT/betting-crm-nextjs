@@ -7,15 +7,18 @@ import { config } from "@/utils/config";
 import SubordinatesReport from "@/component/ui/SubordinatesReport";
 import { getSubordinatesReport } from "@/utils/action";
 import DateFilter from "@/component/ui/DateFilter";
+import LastItemDetector from "@/component/ui/LastItemDetector";
 
 async function getAllSubordinates(
   username: string,
   searchString: string,
-  dateString: string
+  dateString: string,
+  page: number,
+  limit: number
 ) {
   const token = await getCookie();
 
-  let subordinatesurl: string = `${config.server}/api/subordinates/${username}/subordinates?type=username`;
+  let subordinatesurl: string = `${config.server}/api/subordinates/${username}/subordinates?type=username&page=${page||1}&limit=${limit||10}`;
   if (searchString?.length > 0) {
     subordinatesurl += `&search=${encodeURIComponent(String(searchString))}`;
   }
@@ -49,7 +52,9 @@ const page = async ({ params, searchParams }: any) => {
   const data = await getAllSubordinates(
     params?.report,
     searchParams?.search,
-    searchParams?.date
+    searchParams?.date,
+    searchParams?.page,
+    searchParams?.limit,
   );
   const reportData = await getSubordinatesReport(params?.report);
   const fieldsHeadings = [
@@ -90,11 +95,10 @@ const page = async ({ params, searchParams }: any) => {
               </div>
             </div>
           </div>
-          <Table
-            fieldsHeadings={fieldsHeadings}
-            fieldData={fieldsData}
-            data={data}
-          />
+          <>
+            <Table fieldsHeadings={fieldsHeadings} searchDate={searchParams?.date} searchquery={searchParams?.search} fieldData={fieldsData} data={data?.data} />
+            <LastItemDetector searchDate={searchParams?.date} searchquery={searchParams?.search} data={data.data} />
+          </>
         </div>
       </div>
     </>

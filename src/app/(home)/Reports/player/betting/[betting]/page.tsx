@@ -15,15 +15,18 @@ import SubordinatesReport from "@/component/ui/SubordinatesReport";
 import ReportTabs from "../../../ReportTabs";
 import PlayerBets from "@/component/ui/Playerbets";
 import { redirect } from "next/navigation";
+import LastItemDetector from "@/component/ui/LastItemDetector";
 
 // Fetch player bets
 async function getPlayerBettings(
   username: string,
   searchString: string,
-  dateString: string
+  dateString: string,
+  page: number,
+  limit: number
 ) {
   const token = await getCookie();
-  let url:string = `api/bets/${username}/bets?type=username&status=all`;
+  let url:string = `api/bets/${username}/bets?type=username&status=all&page=${page||1}&limit=${limit||10}`;
 
   if (searchString?.length > 0) {
     url += `?search=${encodeURIComponent(String(searchString))}`;
@@ -58,10 +61,9 @@ async function getPlayerBettings(
 }
 
 const Page = async ({ params, searchParams }: any) => {
-  const data = await getPlayerBettings(params?.betting, searchParams?.search, searchParams?.date);
+  const data = await getPlayerBettings(params?.betting, searchParams?.search, searchParams?.date,searchParams?.page,searchParams?.limit);
   const reportData = await getSubordinatesReport(params?.betting);
   if (data?.statuscode === 401) {
-    
     redirect('/logout')
   }
   // Memoize headers and tabs
@@ -95,7 +97,8 @@ const Page = async ({ params, searchParams }: any) => {
           </div>
         </div>
         <div className="h-[calc(100%-13vh)] hideScrollBar border-[1px] border-white dark:border-black dark:border-opacity-10 bg-[#0E0F0F] dark:bg-white border-opacity-10 rounded-2xl overflow-y-scroll">
-            <PlayerBets headers={headers} data={data} />
+          <PlayerBets searchquery={searchParams?.search} searchDate={searchParams?.date} headers={headers} data={data?.data} />
+          <LastItemDetector searchDate={searchParams?.date} searchquery={searchParams?.search} data={data?.data} />
         </div>
       </div>
     </div>

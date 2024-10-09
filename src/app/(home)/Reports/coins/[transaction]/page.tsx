@@ -7,13 +7,16 @@ import SearchBar from "@/component/ui/SearchBar";
 import SubordinatesReport from "@/component/ui/SubordinatesReport";
 import { getSubordinatesReport } from "@/utils/action";
 import DateFilter from "@/component/ui/DateFilter";
+import LastItemDetector from "@/component/ui/LastItemDetector";
 
 async function getAllTransactions(
   username: string,
   searchString: string,
-  dateString: string
+  dateString: string,
+  page: number,
+  limit: number
 ) {
-  let transaction_subordinates: string = `/api/transactions/${username}/subordinate?type=username`;
+  let transaction_subordinates: string = `/api/transactions/${username}/subordinate?type=username&page=${page||10}&limit=${limit||10}`;
   if (searchString?.length > 0) {
     transaction_subordinates += `&search=${encodeURIComponent(
       String(searchString)
@@ -57,8 +60,11 @@ const page = async ({ params, searchParams }: any) => {
   const data = await getAllTransactions(
     params?.transaction,
     searchParams?.search,
-    searchParams?.date
+    searchParams?.date,
+    searchParams?.page,
+    searchParams?.limit,
   );
+
   const reportData = await getSubordinatesReport(params?.transaction);
 
   const fieldsHeadings = ["Amount", "Type", "Sender", "Receiver", "Date"];
@@ -71,11 +77,11 @@ const page = async ({ params, searchParams }: any) => {
   ];
   return (
     <>
-     <div
+      <div
         className="flex-1 h-screen overflow-y-scroll "
       >
         <div className="md:px-5 py-5">
-        <SubordinatesReport reportData={reportData} />
+          <SubordinatesReport reportData={reportData} />
           <div className="md:flex items-center justify-between">
             <ReportTabs params={params?.report} tabs={tabs} />
             <div className="flex w-[40%] pb-2 gap-3">
@@ -87,11 +93,10 @@ const page = async ({ params, searchParams }: any) => {
               </div>
             </div>
           </div>
-          <Table
-            fieldsHeadings={fieldsHeadings}
-            fieldData={fieldsData}
-            data={data}
-          />
+          <>
+            <Table fieldsHeadings={fieldsHeadings} searchDate={searchParams?.date} searchquery={searchParams?.search} fieldData={fieldsData} data={data?.data} />
+            <LastItemDetector searchDate={searchParams?.date} searchquery={searchParams?.search} data={data?.data} />
+          </>
         </div>
       </div>
     </>

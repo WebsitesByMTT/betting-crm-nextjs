@@ -89,7 +89,7 @@ const Page: React.FC = () => {
       } else {
         response = await createSubordinates(dataObject);
       }
-      if (response) {
+      if (response.error) {
         toast.error(response?.error || `Can't create ${formData.role}`);
         if (response?.statuscode===401) {
           router.push('/logout')

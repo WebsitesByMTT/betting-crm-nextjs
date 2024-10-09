@@ -9,8 +9,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { UpdateHeader } from "@/redux/ReduxSlice";
 import Profile from "../svg/Profile";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
-import toast from "react-hot-toast";
 
 const Sidebar = ({ params }: any) => {
   const isOpen = useSelector(

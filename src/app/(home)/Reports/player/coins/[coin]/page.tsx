@@ -7,13 +7,16 @@ import SubordinatesReport from "@/component/ui/SubordinatesReport";
 import { getSubordinatesReport } from "@/utils/action";
 import ReportTabs from "../../../ReportTabs";
 import DateFilter from "@/component/ui/DateFilter";
+import LastItemDetector from "@/component/ui/LastItemDetector";
 
 async function getPlayerTransactions(
   username: string,
   searchString: string,
-  dateString: string
+  dateString: string,
+  page: number,
+  limit: number
 ) {
-  let transaction_subordinates: string = `/api/transactions/${username}/players?type=username`;
+  let transaction_subordinates: string = `/api/transactions/${username}/players?type=username&page=${page||1}&limit=${limit||10}`;
   if (searchString?.length > 0) {
     transaction_subordinates += `&search=${encodeURIComponent(
       String(searchString)
@@ -56,13 +59,14 @@ const page = async ({ params, searchParams }: any) => {
   const data = await getPlayerTransactions(
     params?.coin,
     searchParams?.search,
-    searchParams?.date
+    searchParams?.date,
+    searchParams?.page,
+    searchParams?.limit,
   );
   const reportData = await getSubordinatesReport(params?.coin);
   const fieldsHeadings = ["Amount", "Type", "Sender", "Receiver", "Date"];
 
   const fieldsData = ["amount", "type", "sender", "receiver", "date"];
-
   const tabs = [
     { name: "Coins", route: `/Reports/player/coins/${params?.coin}` },
     { name: "Betting", route: `/Reports/player/betting/${params?.coin}` },
@@ -84,11 +88,10 @@ const page = async ({ params, searchParams }: any) => {
               </div>
             </div>
           </div>
-          <Table
-            fieldsHeadings={fieldsHeadings}
-            fieldData={fieldsData}
-            data={data}
-          />
+          <>
+            <Table fieldsHeadings={fieldsHeadings} searchDate={searchParams?.date} searchquery={searchParams?.search} fieldData={fieldsData} data={data?.data} />
+            <LastItemDetector searchDate={searchParams?.date} searchquery={searchParams?.search} data={data.data} />
+          </>
         </div>
       </div>
     </>

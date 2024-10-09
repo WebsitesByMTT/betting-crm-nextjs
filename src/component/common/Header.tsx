@@ -18,7 +18,7 @@ import Infinite from "../svg/Infinite";
 import { getCredits } from "@/utils/action";
 import toast from "react-hot-toast";
 import { useAppSelector } from "@/utils/hooks";
-import Cookies from "js-cookie";
+
 const Header = ({ Back }: any) => {
   const dispatch = useDispatch();
   const router = useRouter();

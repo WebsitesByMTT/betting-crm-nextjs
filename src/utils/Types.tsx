@@ -64,6 +64,8 @@ export interface TableProps {
   fieldData: string[];
   Page?: string;
   data: any;
+  searchquery?: any;
+  searchDate?: any;
   width?:string;
 }
 

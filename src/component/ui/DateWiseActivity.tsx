@@ -38,6 +38,8 @@ const DateWiseActivity = ({ AvailableDates, playerId, username }: any) => {
   const GetSessions = async () => {
     try {
       const session = await getActivitiesByDateAndPlayer(selectedDate, playerId);
+      console.log(session, "sessipn");
+      
       if (session) {
         setSession(session);
       }
@@ -57,6 +59,8 @@ const DateWiseActivity = ({ AvailableDates, playerId, username }: any) => {
   const handelGetActivities = async (startTime: string, endTime: string, id: string) => {
     try {
       const activity = await getBetsAndTransactions(startTime, endTime, id);
+      console.log(activity, "activity");
+      
       if (activity) {
         setActivities(activity);
       }

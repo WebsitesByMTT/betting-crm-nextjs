@@ -65,7 +65,7 @@ export const updateSubordinates = async (data: any, Id: any) => {
     });
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const resdata = await response.json();
     return resdata;
@@ -73,7 +73,7 @@ export const updateSubordinates = async (data: any, Id: any) => {
     Cookies.remove("token");
     redirect("/login");
   } finally {
-    revalidatePath("/subordinates");
+    revalidatePath("/");
   }
 };
 export const deleteSubordinates = async (id: any) => {
@@ -90,7 +90,7 @@ export const deleteSubordinates = async (id: any) => {
     });
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const responseData = await response.json();
     return { responseData };
@@ -115,7 +115,7 @@ export const createSubordinates = async (data: any) => {
     });
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const responseData = await response.json();
     return { responseData };
@@ -141,7 +141,7 @@ export const updatePlayer = async (data: any, Id: any) => {
     });
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const responseData = await response.json();
     return { responseData };
@@ -166,7 +166,7 @@ export const deletePlayer = async (id: any) => {
     });
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const responseData = await response.json();
     return { responseData };
@@ -192,7 +192,7 @@ export const createPlayer = async (data: any) => {
     });
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const responseData = await response.json();
     return { responseData };
@@ -217,7 +217,7 @@ export const transactions = async (data: any) => {
     });
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const responseData: any = await response.json();
     const respMessage = responseData.message;
@@ -244,7 +244,7 @@ export const getBetsForPlayer = async (userId: any) => {
 
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const data = await response.json();
     const bets = data.Bets;
@@ -269,7 +269,7 @@ export const getCredits = async () => {
 
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
 
     const data = await response.json();
@@ -298,7 +298,7 @@ export const getSubordinatesReport = async (username: string) => {
 
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
 
     const data = await response.json();
@@ -311,19 +311,20 @@ export const getSubordinatesReport = async (username: string) => {
     revalidatePath("/");
   }
 };
-export async function getAllBets(user: any, dateString: string) {
+export async function getAllBets(user: any, dateString: string,page:number,limit:number) {
   const token = await getCookie();
-  let url = "/api/bets";
+  let url = `/api/bets?page=${page||1}&limit=${limit||10}`;
   if (user?.role === "admin") {
     if (dateString?.length > 0) {
-      url += `/?date=${dateString}`;
+      url += `&date=${dateString}`;
     }
   } else {
     url += `/${user?.userId}`;
     if (dateString) {
-      url += `?date=${dateString}`;
+      url += `&date=${dateString}`;
     }
   }
+  console.log(url,"betting");
   try {
     const response = await fetch(`${config.server}${url}`, {
       method: "GET",
@@ -335,7 +336,7 @@ export async function getAllBets(user: any, dateString: string) {
     });
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const data = await response.json();
     const bet = data
@@ -348,14 +349,16 @@ export async function getAllBets(user: any, dateString: string) {
 export async function getAllTransactions(
   user: any,
   searchString: string,
-  dateString: String
+  dateString: String,
+  page: number,
+  limit: number
 ) {
-  let transaction: string = `/api/transactions`;
+  let transaction: string = `/api/transactions?page=${page || 1}&limit=${limit || 10}`;
   if (searchString?.length > 0) {
-    transaction += `?search=${encodeURIComponent(String(searchString))}`;
+    transaction += `&search=${encodeURIComponent(String(searchString))}`;
   }
   if (dateString?.length > 0) {
-    transaction += `?date=${dateString}`;
+    transaction += `&date=${dateString}`;
   }
   let transaction_subordinates: string = `/api/transactions/${user?.username}/subordinate?type=username`;
   if (searchString?.length > 0) {
@@ -383,7 +386,7 @@ export async function getAllTransactions(
 
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const data = await response.json();
     const transactions = data;
@@ -397,11 +400,15 @@ export async function getAllTransactions(
 export async function getSubordinates(
   role: string,
   searchString: string,
-  dateString: string
+  dateString: string,
+  page: number,
+  limit: number
 ) {
+
+  console.log(page, "Page", limit, "page")
   const token = await getCookie();
   const user: any = await getCurrentUser();
-  let url: string = `/api/subordinates?type=${role}`;
+  let url: string = `/api/subordinates?type=${role}&page=${page || 1}&limit=${limit || 10}`;
   if (searchString?.length > 0) {
     url += `&search=${encodeURIComponent(String(searchString))}`;
   }
@@ -431,7 +438,7 @@ export async function getSubordinates(
 
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
 
     const data = await response.json();
@@ -441,7 +448,7 @@ export async function getSubordinates(
     Cookies.remove("token");
     redirect("/login");
   } finally {
-    revalidatePath("/");
+    revalidatePath("/subordinates");
   }
 }
 
@@ -461,7 +468,7 @@ export async function getUserNotifications() {
     );
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const data = await response.json();
     //sort data according to createdAt
@@ -496,7 +503,7 @@ export const setViewedNotification = async (notificationId: any) => {
     );
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const responseData = await response.json();
     return { responseData };
@@ -523,7 +530,7 @@ export const resolveStatus = async (data: any, Id: any) => {
     });
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const responseData = await response.json();
     return { responseData };
@@ -549,7 +556,7 @@ export const fetchSportsCategory = async () => {
     });
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const responseData = await response.json();
     return responseData;
@@ -574,7 +581,7 @@ export const uploadBanner = async (data: any) => {
     });
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const responseData = await response.json();
     return responseData;
@@ -601,7 +608,7 @@ export const getBanners = async (category: string, status: string) => {
     );
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const responseData = await response.json();
     return responseData;
@@ -625,7 +632,7 @@ export const updateBannerStatus = async (banners: string[], status: string) => {
     });
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const responseData = await response.json();
     return responseData;
@@ -649,7 +656,7 @@ export const deleteBanners = async (banners: string[]) => {
     });
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const responseData = await response.json();
     return responseData;
@@ -675,7 +682,7 @@ export async function getDailyActivity(username: string) {
     );
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
     const data = await response.json();
 
@@ -708,8 +715,9 @@ export async function getActivitiesByDateAndPlayer(
 
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
+
     const data = await response.json();
     return data;
   } catch (error) {
@@ -743,7 +751,7 @@ export async function getBetsAndTransactions(
 
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
 
     const data = await response.json();
@@ -771,7 +779,7 @@ export async function updateBet(payload: any) {
 
     if (!response.ok) {
       const error = await response.json();
-       return { error: error.message , statuscode: response?.status };
+      return { error: error.message, statuscode: response?.status };
     }
 
     const data = await response.json();

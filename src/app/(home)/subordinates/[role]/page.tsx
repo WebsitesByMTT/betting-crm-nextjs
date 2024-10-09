@@ -1,11 +1,14 @@
+import LastItemDetector from "@/component/ui/LastItemDetector";
 import Table from "@/component/ui/Table";
 import { getSubordinates } from "@/utils/action";
 
-const page = async ({ params, searchParams }: any) => {
+const Page = async ({ params, searchParams }: any) => {
   const data = await getSubordinates(
     params?.role,
     searchParams?.search,
-    searchParams?.date
+    searchParams?.date,
+    searchParams?.page,
+    searchParams?.limit,
   );
 
   const fieldsHeadings = [
@@ -27,8 +30,11 @@ const page = async ({ params, searchParams }: any) => {
   ];
 
   return (
-    <Table fieldsHeadings={fieldsHeadings} fieldData={fieldsData} data={data} />
+    <>
+      <Table fieldsHeadings={fieldsHeadings} searchDate={searchParams?.date} searchquery={searchParams?.search} fieldData={fieldsData} data={data?.data} />
+      <LastItemDetector searchDate={searchParams?.date} searchquery={searchParams?.search} data={data.data} />
+    </>
   );
 };
 
-export default page;
+export default Page;
