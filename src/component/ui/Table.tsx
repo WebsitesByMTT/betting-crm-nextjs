@@ -19,7 +19,6 @@ const Table: React.FC<TableProps> = ({
   useEffect(() => {
     const fetchUserData = async () => {
       const currentUser: any = await getCurrentUser();
-
       if (currentUser) {
         const userRole = currentUser?.role;
         const roleTabs = await rolesHierarchy(userRole);
@@ -30,7 +29,7 @@ const Table: React.FC<TableProps> = ({
     fetchUserData();
   }, [data]);
 
-  const totals=["Over","Under","Draw"]
+  const totals = ["Over", "Under", "Draw"]
 
   return (
     <>
