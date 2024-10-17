@@ -12,6 +12,7 @@ export const reduxSlice = createSlice({
     updateCredit: null,
     AllNotification: [],
     betId: null,
+    upDateTable:{}
   },
   reducers: {
     UpdateName: (state, action) => {
@@ -31,6 +32,9 @@ export const reduxSlice = createSlice({
     },
     setBetId: (state, action) => {
       state.betId=action.payload
+    },
+    setUpdateTable: (state, action) => {
+      state.upDateTable=action.payload
     }
   },
 });
@@ -42,5 +46,6 @@ export const {
   UpdateCredit,
   NewNotification,
   setBetId,
+  setUpdateTable
 } = reduxSlice.actions;
 export default reduxSlice.reducer;

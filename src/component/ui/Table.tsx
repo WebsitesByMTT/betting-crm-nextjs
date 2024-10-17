@@ -6,6 +6,7 @@ import TableThreeDots from "./TableThreeDots";
 import PlayerUsername from "../PlayerUsername";
 import Link from "next/link";
 import Image from "next/image";
+import { useAppSelector } from "@/utils/hooks";
 
 const Table: React.FC<TableProps> = ({
   fieldsHeadings,
@@ -15,7 +16,6 @@ const Table: React.FC<TableProps> = ({
   width,
 }) => {
   const [tabs, setTabs] = useState<string[]>([]);
-  
   useEffect(() => {
     const fetchUserData = async () => {
       const currentUser: any = await getCurrentUser();
@@ -28,9 +28,8 @@ const Table: React.FC<TableProps> = ({
 
     fetchUserData();
   }, [data]);
-
   const totals = ["Over", "Under", "Draw"]
-
+ 
   return (
     <>
       <div className="bg-[#0E0F0F] overflow-x-scroll dark:bg-white pb-5">

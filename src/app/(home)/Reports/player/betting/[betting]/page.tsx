@@ -16,6 +16,7 @@ import { redirect } from "next/navigation";
 import Beton from "@/component/svg/Beton";
 import { useEffect, useRef, useState } from "react";
 import DataLoader from "@/component/ui/DataLoader";
+import { useAppSelector } from "@/utils/hooks";
 
 // Fetch player bets
 
@@ -26,7 +27,30 @@ const Page = ({ params, searchParams }: any) => {
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState<any[]>([]);
   const [report, setReport] = useState([])
-  const [empty,setEmpty]=useState([])
+  const [empty, setEmpty] = useState([])
+  const updatedData: any = useAppSelector((state) => state.globlestate.upDateTable)
+  console.log(updatedData, "updatedData")
+  console.log(data,"normal state")
+  
+  useEffect(() => {
+    if (updatedData) {
+      const newData = (searchParams?.date || searchParams?.search?.length > 0)?search.map((item) => {
+        if (item?._id === updatedData?._id) {
+          console.log('yes')
+          return { ...item, ...updatedData };
+        }
+        return item;
+      }):data?.map((item) => {
+        if (item?._id === updatedData?._id) {
+          return { ...item, ...updatedData };
+        }
+        return item;
+      });
+      (searchParams?.date || searchParams?.search?.length > 0)?setSearch(newData):
+      setData(newData);
+    }
+  }, [updatedData]);
+
 
   const handelReport = async () => {
     const fetchedReportData = await getSubordinatesReport(params?.betting);

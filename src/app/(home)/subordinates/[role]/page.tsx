@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Table from "@/component/ui/Table";
 import { getSubordinates } from "@/utils/action";
 import DataLoader from "@/component/ui/DataLoader";
+import { useAppSelector } from "@/utils/hooks";
 
 const Page = ({ params, searchParams }: any) => {
   const [data, setData] = useState<any[]>([]);
@@ -11,6 +12,36 @@ const Page = ({ params, searchParams }: any) => {
   const [pageCount, setPageCount] = useState<number>(1)
   const lastElementRef = useRef(null);
   const [empty, setEmpty] = useState([])
+  const updatedData: any = useAppSelector((state) => state.globlestate.upDateTable)
+  useEffect(() => {
+    if (updatedData) {
+      const isDeleted = updatedData.deleted;
+
+      if (isDeleted) {
+        const newSearchData = (searchParams?.date || searchParams?.search?.length > 0)
+          ? search.filter(item => item?._id !== updatedData._id)
+          : search;
+
+        const newData = data.filter(item => item?._id !== updatedData._id);
+
+        (searchParams?.date || searchParams?.search?.length > 0)
+          ? setSearch(newSearchData)
+          : setData(newData);
+
+      } else {
+        const newSearchData = (searchParams?.date || searchParams?.search?.length > 0)
+          ? search.map(item => item?._id === updatedData?._id ? { ...item, ...updatedData } : item)
+          : search;
+
+        const newData = data.map(item => item?._id === updatedData?._id ? { ...item, ...updatedData } : item);
+
+        (searchParams?.date || searchParams?.search?.length > 0)
+          ? setSearch(newSearchData)
+          : setData(newData);
+      }
+    }
+  }, [updatedData]);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,7 +51,7 @@ const Page = ({ params, searchParams }: any) => {
           params?.role,
           searchParams?.search,
           searchParams?.date,
-          (searchParams?.date || searchParams?.search?.length > 0)?1:pageCount,
+          (searchParams?.date || searchParams?.search?.length > 0) ? 1 : pageCount,
           10,
         );
         setEmpty(result?.data)

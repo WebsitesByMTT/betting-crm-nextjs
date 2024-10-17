@@ -39,11 +39,11 @@ const PlayerBets = ({ headers, data, searchquery, searchDate }: any) => {
   const currentTheme = theme === "system" ? systemTheme : theme;
   const pathname = usePathname();
   const isMounted = useRef(false);
-  const [state, setState] = useState<any[]>([]);
   const [searchState, setSearchState] = useState<any[]>([]);
   const [scoresData, setScoresData] = useState<any[]>([]);
   const [uniqueId, setUniqueId] = useState('')
-   
+  
+
   const handelShowScore = async (eventId: string, uniqueId: string) => {
     setUniqueId(uniqueId)
     try {
@@ -57,15 +57,6 @@ const PlayerBets = ({ headers, data, searchquery, searchDate }: any) => {
   }
 
 
-  useEffect(() => {
-    if ((searchquery?.length > 0) || (searchDate)) {
-      setSearchState([...data]);
-    } else {
-      const newData = data.filter((item: any) => !state.some((stateItem) => stateItem?._id === item?._id));
-      setState([...state, ...newData]);
-      setSearchState([]);
-    }
-  }, [data]);
 
   useEffect(() => {
     if (!isMounted.current) {
@@ -324,7 +315,7 @@ const PlayerBets = ({ headers, data, searchquery, searchDate }: any) => {
 
         return [comboRow, ...betRows];
       }) :
-      state?.flatMap((item: any, ind: any) => {
+      data?.flatMap((item: any, ind: any) => {
         const comboRow =
           item.betType === "combo" ? (
             <tr className="text-white font-semibold" key={`combo-${item._id}`}>
@@ -558,7 +549,7 @@ const PlayerBets = ({ headers, data, searchquery, searchDate }: any) => {
 
         return [comboRow, ...betRows];
       });
-  }, [state, searchState, scoresData]);
+  }, [data, searchState, scoresData]);
 
   return (
     <table className="w-[850px] md:w-[calc(100%-2rem)] mx-auto h-auto">

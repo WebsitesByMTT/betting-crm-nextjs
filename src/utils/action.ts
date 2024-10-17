@@ -220,7 +220,7 @@ export const transactions = async (data: any) => {
       return { error: error.message, statuscode: response?.status };
     }
     const responseData: any = await response.json();
-    const respMessage = responseData.message;
+    const respMessage = responseData;
 
     return respMessage;
   } catch (error) {

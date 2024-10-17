@@ -15,7 +15,7 @@ import {
 import toast from "react-hot-toast";
 import ReactDOM from "react-dom";
 import Loader from "./Loader";
-import { UpdateCredit } from "@/redux/ReduxSlice";
+import { UpdateCredit, setUpdateTable } from "@/redux/ReduxSlice";
 import { useDispatch } from "react-redux";
 import Select from "react-select";
 import Image from "next/image";
@@ -149,6 +149,7 @@ const Modal: React.FC<ModalProps> = ({
     try {
       setLoad(true);
       const response = await updateBet(payload)
+      dispatch(setUpdateTable(response?.responseData?.data))
       if (response.error) {
         toast.error(response?.error || "Can't Update Agent");
         if (response.statuscode === 401) {
@@ -179,6 +180,8 @@ const Modal: React.FC<ModalProps> = ({
       try {
         setLoad(true);
         const response = await updateSubordinates(formData, data?._id);
+        dispatch(setUpdateTable(response?.data))
+       
         if (response.error) {
           toast.error(response?.error || "Can't Update Agent");
           if (response.statuscode === 401) {
@@ -187,6 +190,10 @@ const Modal: React.FC<ModalProps> = ({
           }
         } else {
           toast.success(response?.message);
+          setFormData({
+            password: "",
+            status: data?.status,
+          })
         }
         onClose();
         setLoad(false);
@@ -196,7 +203,8 @@ const Modal: React.FC<ModalProps> = ({
     } else {
       try {
         setLoad(true);
-        const response = await updatePlayer(formData, data?._id);
+        const response: any = await updatePlayer(formData, data?._id);
+        dispatch(setUpdateTable(response?.responseData?.data))
         if (response.error) {
           toast.error(response?.error || "Can't Update Player");
           if (response.statuscode === 401) {
@@ -204,6 +212,10 @@ const Modal: React.FC<ModalProps> = ({
           }
         } else {
           toast.success(response?.responseData?.message);
+          setFormData({
+            password: "",
+            status: data?.status,
+          })
         }
         onClose();
         setLoad(false);
@@ -269,6 +281,10 @@ const Modal: React.FC<ModalProps> = ({
       try {
         setLoad(true);
         const response = await deleteSubordinates(id);
+        dispatch(setUpdateTable({
+          _id: response?.responseData?.data?._id,
+          deleted: true
+        }));
         if (response.error) {
           toast.error(response?.error || "Can't Delete Agent");
           if (response.statuscode === 401) {
@@ -281,9 +297,13 @@ const Modal: React.FC<ModalProps> = ({
         setLoad(false);
       }
     } else {
-      try {
+      try {                                                               
         setLoad(true);
         const response = await deletePlayer(id);
+        dispatch(setUpdateTable({
+          _id: response?.responseData?.data?._id,
+          deleted: true
+        }));
         if (response.error) {
           toast.error(response?.error || "Can't Delete Player");
           if (response.statuscode === 401) {
@@ -311,6 +331,7 @@ const Modal: React.FC<ModalProps> = ({
     try {
       setLoad(true);
       const response = await transactions(dataObject);
+      dispatch(setUpdateTable(response?.data))
       if (response.error) {
         toast.error(response?.error);
         if (response.statuscode === 401) {
@@ -322,6 +343,7 @@ const Modal: React.FC<ModalProps> = ({
       }
       onClose();
       toast.success(`${caseType} Successful!`);
+      setTransaction("");
       setLoad(false);
       dispatch(UpdateCredit(true));
     } catch (error) {
@@ -344,6 +366,7 @@ const Modal: React.FC<ModalProps> = ({
     };
     try {
       const response = await resolveStatus(data, id);
+      dispatch(setUpdateTable(response?.responseData?.data))
       if (response) {
         // console.log(response, "bet resolve status");
         toast.success(`${response?.responseData?.message}`);
@@ -425,6 +448,7 @@ const Modal: React.FC<ModalProps> = ({
     };
     setParentBetData(updatedBet)
   };
+
 
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -736,6 +760,17 @@ const Modal: React.FC<ModalProps> = ({
                   className="w-full bg-gray-800 p-2 dark:bg-gray-200 dark:text-black rounded-md text-white mb-4"
                   placeholder="Enter Amount Won"
                 />
+
+                {/* Input field for Total and Spread */}
+                <div className="text-white pb-1.5">Points</div>
+                <input
+                  type="number"
+                  disabled
+                  value={parentbetData.betDetailData?.find((d:any)=>d?._id===betId)?.bet_on?.points}
+                  className="w-full bg-gray-800 p-2 dark:bg-gray-200 dark:text-black rounded-md text-white mb-4"
+                  placeholder="Points"
+                />
+
 
                 {/* Select field for Status */}
                 <div className="text-white p-1.5">Edit Status</div>

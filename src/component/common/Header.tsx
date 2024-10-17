@@ -37,7 +37,7 @@ const Header = ({ Back }: any) => {
   const fetchUser = async () => {
     const currentUser = await getCredits();
 
-    if (currentUser.statuscode === 401) {
+    if (currentUser?.statuscode === 401) {
       router.push("/logout");
     } else {
       setUser(currentUser);
