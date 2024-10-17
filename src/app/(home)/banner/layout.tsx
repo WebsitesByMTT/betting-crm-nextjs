@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Header from "@/component/common/Header";
+import Header from "@/components/common/Header";
 
 export const metadata: Metadata = {
   title: "CRM - Betting Paradise",

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Header from "@/component/common/Header";
-import SearchBar from "@/component/ui/SearchBar";
-import DateFilter from "@/component/ui/DateFilter";
+import Header from "@/components/common/Header";
+import SearchBar from "@/components/ui/SearchBar";
+import DateFilter from "@/components/ui/DateFilter";
 
 export const metadata: Metadata = {
   title: "CRM - Betting Paradise",

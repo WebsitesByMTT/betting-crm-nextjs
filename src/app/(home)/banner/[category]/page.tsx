@@ -1,8 +1,8 @@
 "use client";
-import Back from "@/component/svg/Back";
-import ChevronDown from "@/component/svg/ChevronDown";
-import Loader from "@/component/ui/Loader";
-import UploadBanner from "@/component/ui/UploadBanner";
+import Back from "@/components/svg/Back";
+import ChevronDown from "@/components/svg/ChevronDown";
+import Loader from "@/components/ui/Loader";
+import UploadBanner from "@/components/ui/UploadBanner";
 import { deleteBanners, getBanners, updateBannerStatus } from "@/utils/action";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -44,9 +44,9 @@ const Page = (params: any) => {
     setLoad(true);
     const response = await updateBannerStatus(selectedBanner, newStatus);
     setLoad(false);
-    if (response.statuscode===401) {
-      toast.error(response.error)
-       router.push('/logout');
+    if (response.statuscode === 401) {
+      toast.error(response.error);
+      router.push("/logout");
     }
     toast.success(response.message);
     fetchData(category, status);
@@ -57,9 +57,9 @@ const Page = (params: any) => {
     setLoad(true);
     const response = await deleteBanners(selectedBanner);
     setLoad(false);
-    if (response.statuscode===401) {
-      toast.error(response.error)
-       router.push('/logout');
+    if (response.statuscode === 401) {
+      toast.error(response.error);
+      router.push("/logout");
     }
     toast.success(response.message);
     fetchData(category, status);

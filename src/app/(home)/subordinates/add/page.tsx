@@ -1,16 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { AddFormData } from "@/utils/Types";
-import ChevronDown from "@/component/svg/ChevronDown";
+import ChevronDown from "@/components/svg/ChevronDown";
 import toast from "react-hot-toast";
 import { getCurrentUser, rolesHierarchy } from "@/utils/utils";
-import Loader from "@/component/ui/Loader";
+import Loader from "@/components/ui/Loader";
 import { createPlayer, createSubordinates } from "@/utils/action";
-import Down from "@/component/svg/Down";
+import Down from "@/components/svg/Down";
 import { useRouter } from "next/navigation";
 
 const Page: React.FC = () => {
-  const [load, setLoad] = useState(false)
+  const [load, setLoad] = useState(false);
   const router = useRouter();
   const [formData, setFormData] = useState<AddFormData>({
     username: "",
@@ -31,11 +31,10 @@ const Page: React.FC = () => {
         const user: any = await getCurrentUser();
         const role = user?.role;
         if (role) {
-          const response = await rolesHierarchy(role)
-          setSelectRole(response)
+          const response = await rolesHierarchy(role);
+          setSelectRole(response);
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     };
 
     fetchRole();
@@ -82,28 +81,27 @@ const Page: React.FC = () => {
     };
 
     try {
-      setLoad(true)
-      let response:any;
-      if (formData?.role === 'player') {
+      setLoad(true);
+      let response: any;
+      if (formData?.role === "player") {
         response = await createPlayer(dataObject);
       } else {
         response = await createSubordinates(dataObject);
       }
       if (response.error) {
         toast.error(response?.error || `Can't create ${formData.role}`);
-        if (response?.statuscode===401) {
-          router.push('/logout')
+        if (response?.statuscode === 401) {
+          router.push("/logout");
         }
       } else {
         toast.success(`${formData.role} Created Successfully!`);
         setFormData({ username: "", password: "", role: "" });
         setErrors({ username: "", password: "", role: "" });
       }
-      setLoad(false)
+      setLoad(false);
     } catch (error) {
-      setLoad(false)
+      setLoad(false);
     }
-
   };
 
   return (
@@ -163,14 +161,21 @@ const Page: React.FC = () => {
                     setFormData({ ...formData, role: e.target.value })
                   }
                   className="outline-none w-full dark:bg-onDark bg-[#1A1A1A] px-5 dark:text-black text-white text-opacity-40 rounded-lg pr-3 text-base py-2.5"
-                  style={{ paddingRight: "30px", WebkitAppearance: "none", MozAppearance: "none", appearance: "none" }}
+                  style={{
+                    paddingRight: "30px",
+                    WebkitAppearance: "none",
+                    MozAppearance: "none",
+                    appearance: "none",
+                  }}
                 >
-                  <option value={''}>select</option>
-                  {selectRole.filter(role => role !== "all").map((role, idx) => (
-                    <option key={idx} className="uppercase" value={role}>
-                      {role}
-                    </option>
-                  ))}
+                  <option value={""}>select</option>
+                  {selectRole
+                    .filter((role) => role !== "all")
+                    .map((role, idx) => (
+                      <option key={idx} className="uppercase" value={role}>
+                        {role}
+                      </option>
+                    ))}
                 </select>
                 <span className="pr-4 text-white text-opacity-40 font-bold dark:text-black">
                   <Down />

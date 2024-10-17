@@ -25,11 +25,13 @@ const Header = ({ Back }: any) => {
   const { systemTheme, theme, setTheme } = useTheme();
   const [user, setUser] = useState<any | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [count, setCount] = useState(0)
-  const allNotifications = useAppSelector((state: any) => state?.globlestate?.AllNotification)?.filter((item: any) => item?.viewed === false)?.length
+  const [count, setCount] = useState(0);
+  const allNotifications = useAppSelector(
+    (state: any) => state?.globlestate?.AllNotification
+  )?.filter((item: any) => item?.viewed === false)?.length;
   useEffect(() => {
-    setCount(allNotifications)
-  }, [allNotifications])
+    setCount(allNotifications);
+  }, [allNotifications]);
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -37,7 +39,7 @@ const Header = ({ Back }: any) => {
   const fetchUser = async () => {
     const currentUser = await getCredits();
 
-    if (currentUser.statuscode === 401) {
+    if (currentUser?.statuscode === 401) {
       router.push("/logout");
     } else {
       setUser(currentUser);
@@ -59,10 +61,7 @@ const Header = ({ Back }: any) => {
         <HamBurger />
       </button>
       {Back && (
-        <button
-          onClick={() => router.back()}
-          className="xl:block hidden"
-        >
+        <button onClick={() => router.back()} className="xl:block hidden">
           {Back}
         </button>
       )}

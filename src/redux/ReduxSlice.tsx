@@ -11,7 +11,7 @@ export const reduxSlice = createSlice({
     openHeader: false,
     updateCredit: null,
     AllNotification: [],
-    betId:null,
+    betId: null,
   },
   reducers: {
     UpdateName: (state, action) => {
@@ -41,6 +41,6 @@ export const {
   UpdateHeader,
   UpdateCredit,
   NewNotification,
-  setBetId
+  setBetId,
 } = reduxSlice.actions;
 export default reduxSlice.reducer;

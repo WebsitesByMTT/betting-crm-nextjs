@@ -19,7 +19,7 @@ import { UpdateCredit } from "@/redux/ReduxSlice";
 import { useDispatch } from "react-redux";
 import Select from "react-select";
 import Image from "next/image";
-import { redirect, useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 const Modal: React.FC<ModalProps> = ({
   betId,
@@ -27,8 +27,6 @@ const Modal: React.FC<ModalProps> = ({
   onClose,
   Type,
   data,
-  Tabs = [],
-  Page,
   betData
 
 }) => {
@@ -37,7 +35,6 @@ const Modal: React.FC<ModalProps> = ({
   const [betStatus, setBetStatus] = useState<string>("lost");
   const dispatch = useDispatch();
   const [customStatus, setCustomStatus] = useState<string>('');
-  const router = useRouter()
   const [bannerPreview, setBannerPreview] = useState<any>();
   const [categories, setCategories] = useState<
     { value: string; label: string }[]
@@ -49,13 +46,16 @@ const Modal: React.FC<ModalProps> = ({
     banner: null,
     title: "",
   });
+
+
   //Edit
   const [formData, setFormData] = useState<EditFormData>({
     password: "",
     status: data?.status,
   });
-  // console.log(betData, "betdata");
-  // console.log(betId, "betID");
+
+
+
   const [betDetailStatus, setBetDetailStatus] = useState<any>();
   const [parentbetData, setParentBetData] = useState({
     betType: betData?.betType,
@@ -166,7 +166,17 @@ const Modal: React.FC<ModalProps> = ({
     }
   };
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log("HERE");
+     console.log();
+     
     const newStatus = e.target.value;
+    if(betDetails.isResolved && newStatus === "pending"){
+      console.log("HERE");
+      
+      toast.error("Can't update a resolved bet to pending")
+      return;
+    }
+
     setBetDetailStatus(newStatus);
     if (newStatus !== 'custom') {
       setCustomStatus('');
@@ -299,7 +309,7 @@ const Modal: React.FC<ModalProps> = ({
   };
   //Edit
   //Recharge
-  const [transaction, setTransaction] = useState("0");
+  const [transaction, setTransaction] = useState("");
   const handleRecharge = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const type = Type?.toLowerCase();
@@ -465,8 +475,14 @@ const Modal: React.FC<ModalProps> = ({
     });
   };
 
-
-
+  const handelClose = () => {
+    onClose();
+    setFormData({
+      password: "",
+      status: data?.status,
+    })
+    setTransaction("")
+  }
 
   switch (Type) {
     case "Delete":
@@ -474,7 +490,7 @@ const Modal: React.FC<ModalProps> = ({
         <>
           <div
             className="fixed inset-0 flex items-center justify-center z-[100]"
-            onClick={onClose}
+            onClick={handelClose}
           >
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div
@@ -493,7 +509,7 @@ const Modal: React.FC<ModalProps> = ({
                   </button>
                   <button
                     className="px-6 py-1.5 rounded-3xl bg-gray-300 text-black hover:bg-gray-400 transition duration-200 ease-in-out"
-                    onClick={onClose}
+                    onClick={handelClose}
                   >
                     No
                   </button>
@@ -510,7 +526,7 @@ const Modal: React.FC<ModalProps> = ({
         <>
           <div
             className="fixed inset-0 flex items-center justify-center z-[100]"
-            onClick={onClose}
+            onClick={handelClose}
           >
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div
@@ -527,7 +543,7 @@ const Modal: React.FC<ModalProps> = ({
                         type="password"
                         name="password"
                         placeholder="Enter new password"
-                        value={formData.password}
+                        value={formData?.password}
                         onChange={(e) =>
                           setFormData({ ...formData, password: e.target.value })
                         }
@@ -542,7 +558,7 @@ const Modal: React.FC<ModalProps> = ({
                     <div className="bg-[#1A1A1A] flex pl-4 items-center  dark:bg-onDark dark:border-opacity-30 mb-5 border-opacity-60 border-dark_black rounded-lg border-[1px] relative">
                       <select
                         name="status"
-                        value={formData.status}
+                        value={formData?.status}
                         onChange={(e) =>
                           setFormData({ ...formData, status: e.target.value })
                         }
@@ -572,7 +588,7 @@ const Modal: React.FC<ModalProps> = ({
                       SAVE
                     </button>
                     <button
-                      onClick={onClose}
+                      onClick={handelClose}
                       className="text-white w-[90%] bg-[#c6c6c63b] uppercase border-[2px] dark:text-black border-black dark:border-opacity-50 text-sm text-center py-3 rounded-xl shadow-sm"
                     >
                       CANCLE
@@ -592,7 +608,7 @@ const Modal: React.FC<ModalProps> = ({
         <>
           <div
             className="fixed z-[100] inset-0 flex items-center justify-center"
-            onClick={onClose}
+            onClick={handelClose}
           >
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div
@@ -616,7 +632,7 @@ const Modal: React.FC<ModalProps> = ({
                   </div>
                   <div className="flex space-x-4 justify-center pt-4">
                     <button
-                      onClick={onClose}
+                      onClick={handelClose}
                       className="text-white w-[90%] bg-[#c6c6c63b] uppercase border-[2px]  dark:text-black border-black dark:border-opacity-40 text-sm text-center py-3 rounded-xl shadow-sm"
                     >
                       CANCLE
@@ -641,7 +657,7 @@ const Modal: React.FC<ModalProps> = ({
         <>
           <div
             className="fixed z-[100] inset-0 flex items-center justify-center"
-            onClick={onClose}
+            onClick={handelClose}
           >
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div
@@ -675,7 +691,7 @@ const Modal: React.FC<ModalProps> = ({
         <>
           <div
             className="fixed z-[100] inset-0 flex items-center justify-center"
-            onClick={onClose}
+            onClick={handelClose}
           >
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div
@@ -786,7 +802,7 @@ const Modal: React.FC<ModalProps> = ({
         <>
           <div
             className="fixed inset-0 flex items-center justify-center z-[100]"
-            onClick={onClose}
+            onClick={handelClose}
           >
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div
@@ -902,7 +918,7 @@ const Modal: React.FC<ModalProps> = ({
                       Upload
                     </button>
                     <button
-                      onClick={onClose}
+                      onClick={handelClose}
                       className="text-white w-[90%] bg-[#c6c6c63b] uppercase border-[2px] dark:text-black border-black dark:border-opacity-50 text-sm text-center py-3 rounded-xl shadow-sm"
                     >
                       cancel

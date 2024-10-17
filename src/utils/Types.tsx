@@ -66,7 +66,7 @@ export interface TableProps {
   data: any;
   searchquery?: any;
   searchDate?: any;
-  width?:string;
+  width?: string;
 }
 
 export interface TransactionProps {

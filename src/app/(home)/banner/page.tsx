@@ -1,6 +1,6 @@
 "use client";
 
-import Modal from "@/component/ui/Modal";
+import Modal from "@/components/ui/Modal";
 import { fetchSportsCategory, getBanners } from "@/utils/action";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -11,7 +11,7 @@ const Page = () => {
   const [open, setOPen] = useState(false);
   const [toggle, setToggle] = useState(false);
   const [type, setType] = useState("");
-  const router=useRouter()
+  const router = useRouter();
   const [categories, setCategories] = useState<string[]>([]);
   const pathname = usePathname();
   const handelOpen = (state: boolean, Type: string) => {
@@ -27,9 +27,9 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async (category: string) => {
       const categoriesData = await fetchSportsCategory();
-      if (categoriesData?.statuscode===401) {
-        toast.error(categoriesData.error)
-         router.push('/logout');
+      if (categoriesData?.statuscode === 401) {
+        toast.error(categoriesData.error);
+        router.push("/logout");
       }
       setCategories(categoriesData);
     };

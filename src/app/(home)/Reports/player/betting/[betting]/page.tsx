@@ -1,76 +1,84 @@
-import { config } from "@/utils/config";
-import { getCookie } from "@/utils/utils";
-import { revalidatePath } from "next/cache";
-import { getSubordinatesReport } from "@/utils/action";
-import DateFilter from "@/component/ui/DateFilter";
-import SearchBar from "@/component/ui/SearchBar";
-import Sport from "@/component/svg/Sport";
-import Bet from "@/component/svg/Bet";
-import Market from "@/component/svg/Market";
-import Odds from "@/component/svg/odds";
-import Amount from "@/component/svg/Amount";
-import Status from "@/component/svg/Status";
-import Action from "@/component/svg/Action";
-import SubordinatesReport from "@/component/ui/SubordinatesReport";
+"use client";
+import { getPlayerBettings, getSubordinatesReport } from "@/utils/action";
+import DateFilter from "@/components/ui/DateFilter";
+import SearchBar from "@/components/ui/SearchBar";
+import Sport from "@/components/svg/Sport";
+import Bet from "@/components/svg/Bet";
+import Market from "@/components/svg/Market";
+import Odds from "@/components/svg/odds";
+import Amount from "@/components/svg/Amount";
+import Status from "@/components/svg/Status";
+import Action from "@/components/svg/Action";
+import SubordinatesReport from "@/components/ui/SubordinatesReport";
 import ReportTabs from "../../../ReportTabs";
-import PlayerBets from "@/component/ui/Playerbets";
+import PlayerBets from "@/components/ui/Playerbets";
 import { redirect } from "next/navigation";
-import LastItemDetector from "@/component/ui/LastItemDetector";
+import Beton from "@/components/svg/Beton";
+import { useEffect, useRef, useState } from "react";
+import DataLoader from "@/components/ui/DataLoader";
 
 // Fetch player bets
-async function getPlayerBettings(
-  username: string,
-  searchString: string,
-  dateString: string,
-  page: number,
-  limit: number
-) {
-  const token = await getCookie();
-  let url:string = `api/bets/${username}/bets?type=username&status=all&page=${page||1}&limit=${limit||10}`;
 
-  if (searchString?.length > 0) {
-    url += `?search=${encodeURIComponent(String(searchString))}`;
-  }
-  if (dateString?.length > 0) {
-    url += `&date=${encodeURIComponent(String(dateString))}`;
-  }
+const Page = ({ params, searchParams }: any) => {
+  const [pageCount, setPageCount] = useState<number>(1);
+  const lastElementRef = useRef(null);
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState<any[]>([]);
+  const [report, setReport] = useState([]);
+  const [empty, setEmpty] = useState([]);
 
-  try {
-    const response:any = await fetch(`${config.server}/${url}`, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: `userToken=${token}`,
-      },
-    });
+  const handelReport = async () => {
+    const fetchedReportData = await getSubordinatesReport(params?.betting);
+    setReport(fetchedReportData);
+  };
+  useEffect(() => {
+    handelReport();
+  }, [params?.betting]);
 
-    if (!response.ok) {
-      const error = await response.json();
-      
-      return { error: error.message,statuscode: response.status};
-    } 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true); // Start loading
 
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    return { error: "Failed to fetch data" };
-  } finally {
-    revalidatePath("/"); // Only call this if necessary
-  }
-}
+        const result = await getPlayerBettings(
+          params?.betting,
+          searchParams?.search,
+          searchParams?.date,
+          pageCount,
+          10
+        );
+        setEmpty(result?.data);
+        if (result?.data?.statuscode === 401) {
+          redirect("/logout");
+        }
+        if (searchParams?.search?.length > 0 || searchParams?.date) {
+          setData([]);
+          setPageCount(1);
+          setSearch([...result?.data]);
+        } else {
+          const newData = result?.data?.filter(
+            (item: any) =>
+              !data.some((stateItem) => stateItem?._id === item?._id)
+          );
+          setData([...data, ...newData]);
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      } finally {
+        setLoading(false); // End loading
+      }
+    };
 
-const Page = async ({ params, searchParams }: any) => {
-  const data = await getPlayerBettings(params?.betting, searchParams?.search, searchParams?.date,searchParams?.page,searchParams?.limit);
-  const reportData = await getSubordinatesReport(params?.betting);
-  if (data?.statuscode === 401) {
-    redirect('/logout')
-  }
+    fetchData();
+  }, [params?.betting, searchParams?.search, searchParams?.date, pageCount]);
+
   // Memoize headers and tabs
   const headers = [
     { icon: <Sport />, text: "sport" },
     { icon: <Bet />, text: "Stake" },
     { icon: <Market />, text: "Category" },
+    { icon: <Beton />, text: "Bet On" },
     { icon: <Odds />, text: "odds" },
     { icon: <Amount />, text: "Possible Winning" },
     { icon: <Status />, text: "status" },
@@ -83,10 +91,38 @@ const Page = async ({ params, searchParams }: any) => {
     { name: "Activity", route: `/Reports/player/activity/${params?.betting}` },
   ];
 
+  // Use IntersectionObserver to detect when the last element is in view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (searchParams?.search?.length > 0 || searchParams?.date) {
+          setPageCount(1);
+        }
+        if (entries[0]?.isIntersecting && data?.length >= 10) {
+          setPageCount((prevPageCount) => prevPageCount + 1);
+        }
+        ` `;
+      },
+      {
+        threshold: 1,
+      }
+    );
+
+    if (lastElementRef.current) {
+      observer.observe(lastElementRef.current);
+    }
+
+    return () => {
+      if (lastElementRef.current) {
+        observer.unobserve(lastElementRef.current);
+      }
+    };
+  }, [data, search]);
+
   return (
     <div className="flex-1 h-screen overflow-y-scroll">
       <div className="px-4 md:px-10 py-5">
-        {reportData && <SubordinatesReport reportData={reportData} />}
+        {report && <SubordinatesReport reportData={report} />}
         <div className="md:flex items-center justify-between">
           {tabs && <ReportTabs params={params?.report} tabs={tabs} />}
           <div className="space-y-2 md:space-y-0 md:flex w-full md:w-[40%] pb-2 gap-3">
@@ -97,8 +133,23 @@ const Page = async ({ params, searchParams }: any) => {
           </div>
         </div>
         <div className="h-[calc(100%-13vh)] hideScrollBar border-[1px] border-white dark:border-black dark:border-opacity-10 bg-[#0E0F0F] dark:bg-white border-opacity-10 rounded-2xl overflow-y-scroll">
-          <PlayerBets searchquery={searchParams?.search} searchDate={searchParams?.date} headers={headers} data={data?.data} />
-          <LastItemDetector searchDate={searchParams?.date} searchquery={searchParams?.search} data={data?.data} />
+          <PlayerBets
+            searchquery={searchParams?.search}
+            searchDate={searchParams?.date}
+            headers={headers}
+            data={
+              searchParams?.date || searchParams?.search?.length > 0
+                ? search
+                : data
+            }
+          />
+          {empty?.length >= 10 && (
+            <div
+              ref={lastElementRef}
+              style={{ height: "4px", width: "100%" }}
+            />
+          )}
+          {loading && <DataLoader />}
         </div>
       </div>
     </div>

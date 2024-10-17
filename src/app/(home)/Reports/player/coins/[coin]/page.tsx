@@ -1,71 +1,90 @@
-import Table from "@/component/ui/Table";
-import { config } from "@/utils/config";
-import { getCookie } from "@/utils/utils";
-import { revalidatePath } from "next/cache";
-import SearchBar from "@/component/ui/SearchBar";
-import SubordinatesReport from "@/component/ui/SubordinatesReport";
-import { getSubordinatesReport } from "@/utils/action";
+"use client";
+import Table from "@/components/ui/Table";
+import SearchBar from "@/components/ui/SearchBar";
+import SubordinatesReport from "@/components/ui/SubordinatesReport";
+import { getPlayerTransactions, getSubordinatesReport } from "@/utils/action";
 import ReportTabs from "../../../ReportTabs";
-import DateFilter from "@/component/ui/DateFilter";
-import LastItemDetector from "@/component/ui/LastItemDetector";
+import DateFilter from "@/components/ui/DateFilter";
+import { useEffect, useRef, useState } from "react";
+import DataLoader from "@/components/ui/DataLoader";
 
-async function getPlayerTransactions(
-  username: string,
-  searchString: string,
-  dateString: string,
-  page: number,
-  limit: number
-) {
-  let transaction_subordinates: string = `/api/transactions/${username}/players?type=username&page=${page||1}&limit=${limit||10}`;
-  if (searchString?.length > 0) {
-    transaction_subordinates += `&search=${encodeURIComponent(
-      String(searchString)
-    )}`;
-  }
-  if (dateString?.length > 0) {
-    transaction_subordinates += `&date=${encodeURIComponent(
-      String(dateString)
-    )}`;
-  }
-  const token = await getCookie();
-  try {
-    const response = await fetch(
-      `${config.server}${transaction_subordinates}`,
+const Page = ({ params, searchParams }: any) => {
+  const [data, setData] = useState<any[]>([]);
+  const lastElementRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [pageCount, setPageCount] = useState<number>(1);
+  const [report, setReport] = useState([]);
+  const [search, setSearch] = useState<any[]>([]);
+  const [empty, setEmpty] = useState([]);
+  const handelReport = async () => {
+    const fetchedReportData = await getSubordinatesReport(params?.coin);
+    setReport(fetchedReportData);
+  };
+  useEffect(() => {
+    handelReport();
+  }, [params?.coin]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true); // Start loading
+        const result = await getPlayerTransactions(
+          params?.coin,
+          searchParams?.search,
+          searchParams?.date,
+          searchParams?.search?.length > 0 || searchParams?.date
+            ? 1
+            : pageCount,
+          10
+        );
+        setEmpty(result?.data);
+        if (searchParams?.search?.length > 0 || searchParams?.date) {
+          setSearch([...result?.data]);
+        } else {
+          const newData = result?.data?.filter(
+            (item: any) =>
+              !data.some((stateItem) => stateItem?._id === item?._id)
+          );
+          setData([...data, ...newData]);
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      } finally {
+        setLoading(false); // End loading
+      }
+    };
+
+    fetchData();
+  }, [params?.coin, searchParams?.search, searchParams?.date, pageCount]);
+
+  // Use IntersectionObserver to detect when the last element is in view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (searchParams?.search?.length > 0 || searchParams?.date) {
+          setPageCount(1);
+        }
+        if (entries[0]?.isIntersecting && data?.length >= 10) {
+          setPageCount((prevPageCount) => prevPageCount + 1);
+        }
+      },
       {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Cookie: `userToken=${token}`,
-        },
+        threshold: 1,
       }
     );
 
-    if (!response.ok) {
-      const error = await response.json();
-      return { error: error.message };
+    if (lastElementRef.current) {
+      observer.observe(lastElementRef.current);
     }
 
-    const data = await response.json();
-    const transactions = data;
-    return transactions;
-  } catch (error) {
-  } finally {
-    revalidatePath("/");
-  }
-}
+    return () => {
+      if (lastElementRef.current) {
+        observer.unobserve(lastElementRef.current);
+      }
+    };
+  }, [data]);
 
-const page = async ({ params, searchParams }: any) => {
-  const data = await getPlayerTransactions(
-    params?.coin,
-    searchParams?.search,
-    searchParams?.date,
-    searchParams?.page,
-    searchParams?.limit,
-  );
-  const reportData = await getSubordinatesReport(params?.coin);
   const fieldsHeadings = ["Amount", "Type", "Sender", "Receiver", "Date"];
-
   const fieldsData = ["amount", "type", "sender", "receiver", "date"];
   const tabs = [
     { name: "Coins", route: `/Reports/player/coins/${params?.coin}` },
@@ -76,7 +95,7 @@ const page = async ({ params, searchParams }: any) => {
     <>
       <div className="flex-1 h-screen overflow-y-scroll ">
         <div className="px-4 md:px-10 py-5">
-          <SubordinatesReport reportData={reportData} />
+          <SubordinatesReport reportData={report} />
           <div className="md:flex items-center justify-between">
             <ReportTabs params={params?.report} tabs={tabs} />
             <div className="space-y-2 md:space-y-0 md:flex w-full md:w-[40%] pb-2 gap-3">
@@ -89,8 +108,22 @@ const page = async ({ params, searchParams }: any) => {
             </div>
           </div>
           <>
-            <Table fieldsHeadings={fieldsHeadings} searchDate={searchParams?.date} searchquery={searchParams?.search} fieldData={fieldsData} data={data?.data} />
-            <LastItemDetector searchDate={searchParams?.date} searchquery={searchParams?.search} data={data.data} />
+            <Table
+              fieldsHeadings={fieldsHeadings}
+              fieldData={fieldsData}
+              data={
+                searchParams?.date || searchParams?.search?.length > 0
+                  ? search
+                  : data
+              }
+            />
+            {empty?.length >= 10 && (
+              <div
+                ref={lastElementRef}
+                style={{ height: "4px", width: "100%" }}
+              />
+            )}
+            {loading && <DataLoader />}
           </>
         </div>
       </div>
@@ -98,4 +131,4 @@ const page = async ({ params, searchParams }: any) => {
   );
 };
 
-export default page;
+export default Page;

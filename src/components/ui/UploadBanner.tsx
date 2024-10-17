@@ -1,6 +1,6 @@
 "use client";
 
-import Modal from "@/component/ui/Modal";
+import Modal from "@/components/ui/Modal";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 

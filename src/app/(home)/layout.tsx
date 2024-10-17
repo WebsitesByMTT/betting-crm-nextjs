@@ -1,6 +1,6 @@
-import Sidebar from "@/component/common/Sidebar";
+import Sidebar from "@/components/common/Sidebar";
 import type { Metadata } from "next";
-import Notifications from "@/component/ui/Notifications";
+import Notifications from "@/components/ui/Notifications";
 
 export const metadata: Metadata = {
   title: "CRM - Betting Paradise",

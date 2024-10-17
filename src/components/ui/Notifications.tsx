@@ -22,7 +22,7 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
-    if (notifications.length > 0) {
+    if (notifications?.length > 0) {
       dispatch(NewNotification(notifications));
     }
   }, [notifications])

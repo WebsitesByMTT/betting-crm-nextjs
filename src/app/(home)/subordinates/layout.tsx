@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Header from "@/component/common/Header";
-import Tabs from "@/component/ui/Tabs";
+import Header from "@/components/common/Header";
+import Tabs from "@/components/ui/Tabs";
 import { getCurrentUser, rolesHierarchy } from "@/utils/utils";
 import Link from "next/link";
-import SearchBar from "@/component/ui/SearchBar";
-import DateFilter from "@/component/ui/DateFilter";
+import SearchBar from "@/components/ui/SearchBar";
+import DateFilter from "@/components/ui/DateFilter";
 
 export const metadata: Metadata = {
   title: "CRM - Betting Paradise",

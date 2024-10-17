@@ -1,4 +1,4 @@
-import DeleteUser from "@/component/ui/DeleteUser";
+import DeleteUser from "@/components/ui/DeleteUser";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -9,7 +9,6 @@ const Logout = async () => {
     redirect("/login");
   }
 
-  
   return <DeleteUser deleteToken={deleteToken} />;
 };
 

@@ -1,22 +1,21 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import ShowEye from "@/component/svg/ShowEye";
-import HideEye from "@/component/svg/HideEye";
+import ShowEye from "@/components/svg/ShowEye";
+import HideEye from "@/components/svg/HideEye";
 import { useRouter } from "next/navigation";
 import { DecodeToken, Field, FormData, JwtPayload } from "@/utils/Types";
 import toast from "react-hot-toast";
 import { GetCaptcha, loginUser } from "@/utils/action";
-import User from "@/component/svg/User";
-import Password from "@/component/svg/Password";
+import User from "@/components/svg/User";
+import Password from "@/components/svg/Password";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
-import Loader from "@/component/ui/Loader";
-import Refresh from "@/component/svg/Refresh";
-
+import Loader from "@/components/ui/Loader";
+import Refresh from "@/components/svg/Refresh";
 
 const Page: React.FC = () => {
-  const [load, setLoad] = useState(false)
+  const [load, setLoad] = useState(false);
   const router = useRouter();
   const [captchaSrc, setCaptchaSrc] = useState("");
 
@@ -25,13 +24,13 @@ const Page: React.FC = () => {
       type: "text",
       placeholder: "User Name",
       Name: "username",
-      icon: <User />
+      icon: <User />,
     },
     {
       type: "password",
       placeholder: "Password",
       Name: "password",
-      icon: <Password />
+      icon: <Password />,
     },
     {
       type: "text",
@@ -54,11 +53,10 @@ const Page: React.FC = () => {
         setCaptchaSrc(captcha.responseData?.captcha);
         setFormData((prevState) => ({
           ...prevState,
-          captchaToken: captcha.responseData?.token
+          captchaToken: captcha.responseData?.token,
         }));
       }
-    } catch (error: any) {
-    }
+    } catch (error: any) {}
   };
   useEffect(() => {
     fetchCaptcha();
@@ -83,31 +81,29 @@ const Page: React.FC = () => {
       toast.error("Enter password!");
     } else {
       try {
-        setLoad(true)
+        setLoad(true);
         const response = await loginUser(formData);
         if (response?.token) {
           const token = response?.token;
-          if (jwtDecode<JwtPayload>(token)?.role === 'player') {
-            toast.error('Access denied !')
+          if (jwtDecode<JwtPayload>(token)?.role === "player") {
+            toast.error("Access denied !");
           } else {
             Cookies.set("token", token);
             router.push("/");
-            toast.success(response?.message)
+            toast.success(response?.message);
           }
-
         } else {
           toast.error(response.error);
           fetchCaptcha();
         }
-        setLoad(false)
+        setLoad(false);
       } catch (error) {
-        setLoad(false)
+        setLoad(false);
         toast.error("An unknown error occurred");
         fetchCaptcha();
       }
     }
   };
-
 
   return (
     <>
@@ -156,11 +152,17 @@ const Page: React.FC = () => {
                   )}
                   {captchaSrc && item.Name == "captcha" && (
                     <>
-                    <div
-                      dangerouslySetInnerHTML={{ __html: captchaSrc }}
-                      className="h-full border-[#dfdfdfbc]  bg-[#ffffffc5] rounded-md"
-                    ></div>
-                    <button type="button" className="px-3" onClick={fetchCaptcha}><Refresh /></button>
+                      <div
+                        dangerouslySetInnerHTML={{ __html: captchaSrc }}
+                        className="h-full border-[#dfdfdfbc]  bg-[#ffffffc5] rounded-md"
+                      ></div>
+                      <button
+                        type="button"
+                        className="px-3"
+                        onClick={fetchCaptcha}
+                      >
+                        <Refresh />
+                      </button>
                     </>
                   )}
                 </div>

@@ -12,9 +12,9 @@ const SearchBar = () => {
   const handleClick = () => {
     const param = searchParams?.get("date");
     if (param) {
-      router.replace(`${pathname}?date=${param}&search=${search}`);
+      router.push(`${pathname}?date=${param}&search=${search}`);
     } else {
-      router.replace(`${pathname}/?search=${search}`);
+      router.push(`${pathname}?search=${search}`);
     }
   };
 
