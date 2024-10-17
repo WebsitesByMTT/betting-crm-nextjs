@@ -1000,7 +1000,7 @@ export const getScores = async (eventId: string | null) => {
 
 export const getTransactionInsights = async (user: any) => {
   const token = await getCookie();
-  let url = "api/transactions/monthly/";
+  let url = "api/transactions/";
   if (user?.role === "admin") {
     url += "admin";
   } else {

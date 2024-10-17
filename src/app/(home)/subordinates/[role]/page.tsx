@@ -1,4 +1,3 @@
-
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Table from "@/components/ui/Table";
@@ -7,7 +6,6 @@ import DataLoader from "@/components/ui/DataLoader";
 import toast from "react-hot-toast";
 import { ChartConfig } from "@/components/ui/chart";
 import LineChartData from "@/components/ui/LineChartData";
-
 
 const Page = ({ params, searchParams }: any) => {
   const [data, setData] = useState<any[]>([]);
@@ -36,18 +34,21 @@ const Page = ({ params, searchParams }: any) => {
           params?.role,
           searchParams?.search,
           searchParams?.date,
-          (searchParams?.date || searchParams?.search?.length > 0)?1:pageCount,
-          10,
+          searchParams?.date || searchParams?.search?.length > 0
+            ? 1
+            : pageCount,
+          10
         );
-        setEmpty(result?.data)
+        setEmpty(result?.data);
         if (searchParams?.search?.length > 0 || searchParams?.date) {
           setSearch([...result?.data]);
         } else {
           const newData = result?.data?.filter(
-            (item: any) => !data.some((stateItem: any) => stateItem?._id === item?._id)
+            (item: any) =>
+              !data.some((stateItem: any) => stateItem?._id === item?._id)
           );
           setData([...data, ...newData]);
-          setSearch([])
+          setSearch([]);
         }
       } catch (error) {
         console.error("Error fetching subordinates:", error);
@@ -81,7 +82,6 @@ const Page = ({ params, searchParams }: any) => {
     const fetchData = async () => {
       try {
         const data = await getSubordinateInsights();
-        console.log(data);
         if (data?.error) {
           return toast.error(data?.error);
         }
@@ -111,7 +111,6 @@ const Page = ({ params, searchParams }: any) => {
           };
         });
 
-        console.log(chartData);
         setSubordinateData(chartData);
       } catch (error) {
         console.error("Error fetching transactions:", error);
@@ -126,14 +125,14 @@ const Page = ({ params, searchParams }: any) => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (searchParams?.search?.length > 0 || searchParams?.date) {
-          setPageCount(1)
+          setPageCount(1);
         }
         if (entries[0]?.isIntersecting && data?.length >= 10) {
           setPageCount((prevPageCount) => prevPageCount + 1);
         }
       },
       {
-        threshold: 1
+        threshold: 1,
       }
     );
 
